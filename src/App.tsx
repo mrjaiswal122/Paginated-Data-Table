@@ -43,9 +43,7 @@ const App: React.FC = () => {
   const fetchData = async (page: number) => {
     setLoading(true);
     try {
-      const response = await fetch(
-        `${API_URL}${page}`
-      );
+      const response = await fetch(`${API_URL}${page}`);
       const result = await response.json();
       const extractedData = result.data.map((item: any) => ({
         id: item.id,
@@ -69,15 +67,15 @@ const App: React.FC = () => {
     console.log(e);
 
     setPage(e.page + 1);
-    setSelectAll(false); // Reset "Select All" checkbox when page changes
+    setSelectAll(false); // Reset Select All checkbox when page changes
   };
 
-  // Check if a row is selected by looking it up in selectedRowsMap
+  // Checking if a row is selected or not using selectedRowsMap
   const isRowSelected = (row: DataRow) => {
     return selectedRowsMap[row.id] || false;
   };
 
-  // Handle checkbox change event
+  // Handle checkbox change evento
   const onCheckboxChange = (e: CheckboxChangeEvent, rowData: DataRow) => {
     const newSelectedRows = { ...selectedRowsMap };
 
@@ -88,7 +86,7 @@ const App: React.FC = () => {
     }
 
     setSelectedRowsMap(newSelectedRows);
-    localStorage.setItem("selectedRows", JSON.stringify(newSelectedRows)); // Save to localStorage
+    localStorage.setItem("selectedRows", JSON.stringify(newSelectedRows)); // Saveingto localStorage
   };
 
   // Handle "Select All" checkbox change
@@ -126,9 +124,7 @@ const App: React.FC = () => {
       const pageData = [...data];
       try {
         for (let i = 1; i < pagesToLoad; i++) {
-          const response = await fetch(
-            `${API_URL}${page + i}`
-          );
+          const response = await fetch(`${API_URL}${page + i}`);
           const result = await response.json();
           const extractedData = result.data.map((item: any) => ({
             id: item.id,
@@ -164,55 +160,66 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col w-full border-y ">
+    <div className="flex flex-col  border-y  ">
       {loading ? (
         <Spinner />
       ) : (
         <>
           <div className="min-w-fit mx-auto  p-6 overflow-scroll">
-            <h1 className="w-full text-center my-3 text-4xl font-bold">Paginated Data Table</h1>
+            <h1 className="w-full text-center my-3 text-4xl font-bold">
+              Paginated Data Table
+            </h1>
             <DataTable value={data} paginator={false} className="border-y">
               <Column
                 className="border-y"
                 header={
+                  // custom componenets
                   <SelectAll
                     selectAll={selectAll}
                     onSelectAllChange={onSelectAllChange}
                     onManualSelectRows={onManualSelectRows}
                   />
-                 
                 }
                 body={renderCheckbox}
                 headerStyle={{ width: "4em" }}
                 exportable={false}
-                
               />
-              <Column field="title" header="Title" className="border-y" style={{width:'20%'}}/>
+              <Column
+                field="title"
+                header="Title"
+                className="border-y"
+                style={{ width: "20%" }}
+              />
               <Column
                 field="place_of_origin"
                 header="Place of Origin"
-                style={{width:'20%'}}
+                style={{ width: "20%" }}
                 className="border-y "
               />
               <Column
                 field="artist_display"
                 header="Artist"
                 className="border-y w-fit"
-                style={{width:'20%'}}
+                style={{ width: "20%" }}
               />
               <Column
                 field="inscriptions"
                 header="Inscriptions"
                 className="border-y"
-                style={{width:'20%'}}
+                style={{ width: "20%" }}
               />
               <Column
                 field="date_start"
                 header="Start Date"
                 className="border-y"
-                style={{width:'20%'}}
+                style={{ width: "20%" }}
               />
-              <Column field="date_end" header="End Date" className="border-y" style={{width:'20%'}}/>
+              <Column
+                field="date_end"
+                header="End Date"
+                className="border-y"
+                style={{ width: "20%" }}
+              />
             </DataTable>
             <Paginator
               first={(page - 1) * rowsPerPage}
