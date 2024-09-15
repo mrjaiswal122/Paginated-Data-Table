@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+.p-paginator-pages button {
+    margin: 0 10px; 
+    text-decoration: none;
+}
+.p-checkbox-box{
+    display: none;
+}
+ 
+tr:hover{
+    background-color: #f3f4f6;
+}
+thead{
+    background-color: #f9fbfa;
+}
