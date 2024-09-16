@@ -18,10 +18,10 @@ export default function SelectAll({
     setShowDropDown((prev) => !prev); // Toggle dropdown visibility
   };
   const handleSubmit = () => {
-    if (selectRows > 0 && selectRows<200) {
+    if (selectRows > 0 && selectRows<1000 ) {
       onManualSelectRows(selectRows);
     } else {
-      alert("Number should be Greater than 0 and less than 200");
+      alert("Number should be Greater than 0 and less than 1000");
     }
     setSelectRows(0);
     toggleOptions();

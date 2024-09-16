@@ -35,11 +35,14 @@ const App: React.FC = () => {
     getSelectedRowsFromStorage
   );
   const [selectAll, setSelectAll] = useState<boolean>(false); // State for "Select All" checkbox
-
+  useEffect(()=>{
+    localStorage.setItem("selectedRows", JSON.stringify({}));
+    
+  },[]);
   useEffect(() => {
     fetchData(page);
   }, [page]);
-
+  
   const fetchData = async (page: number) => {
     setLoading(true);
     try {
@@ -110,9 +113,49 @@ const App: React.FC = () => {
     localStorage.setItem("selectedRows", JSON.stringify(newSelectedRows)); // Save to localStorage
     setSelectAll(checked!); // Update "Select All" state
   };
+  // const onManualSelectRows = async (selectedRowIds: number) => {
+  //   const newSelectedRowsMap = { ...selectedRowsMap };
+
+  //   if (selectedRowIds > 0 && selectedRowIds <= 12) {
+  //     for (let i = 1; i <= selectedRowIds; i++) {
+  //       newSelectedRowsMap[data[i - 1].id] = true;
+  //     }
+  //   } else {
+  //     setLoading(true);
+  //     const pagesToLoad = Math.ceil(selectedRowIds / rowsPerPage);
+  //     //    const remainingRowsToLoad=selectedRowIds%rowsPerPage;
+  //     const pageData = [...data];
+  //     try {
+  //       for (let i = 1; i < pagesToLoad; i++) {
+  //         const response = await fetch(`${API_URL}${page + i}`);
+  //         const result = await response.json();
+  //         const extractedData = result.data.map((item: any) => ({
+  //           id: item.id,
+  //           title: item.title,
+  //           place_of_origin: item.place_of_origin,
+  //           artist_display: item.artist_display,
+  //           inscriptions: item.inscriptions,
+  //           date_start: item.date_start,
+  //           date_end: item.date_end,
+  //         }));
+  //         pageData.push(...extractedData);
+  //       }
+  //       for (let i = 1; i <= selectedRowIds; i++) {
+  //         newSelectedRowsMap[pageData[i - 1].id] = true;
+  //       }
+  //     } catch (error) {
+  //       console.log(error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   }
+
+  //   setSelectedRowsMap(newSelectedRowsMap);
+  //   localStorage.setItem("selectedRows", JSON.stringify(newSelectedRowsMap)); // Save to localStorage
+  // };
   const onManualSelectRows = async (selectedRowIds: number) => {
     const newSelectedRowsMap = { ...selectedRowsMap };
-
+  
     if (selectedRowIds > 0 && selectedRowIds <= 12) {
       for (let i = 1; i <= selectedRowIds; i++) {
         newSelectedRowsMap[data[i - 1].id] = true;
@@ -120,12 +163,15 @@ const App: React.FC = () => {
     } else {
       setLoading(true);
       const pagesToLoad = Math.ceil(selectedRowIds / rowsPerPage);
-      //    const remainingRowsToLoad=selectedRowIds%rowsPerPage;
-      const pageData = [...data];
+      const requests = [];
+  
+      for (let i = 1; i < pagesToLoad; i++) {
+        requests.push(fetch(`${API_URL}${page + i}`).then(res => res.json()));
+      }
+  
       try {
-        for (let i = 1; i < pagesToLoad; i++) {
-          const response = await fetch(`${API_URL}${page + i}`);
-          const result = await response.json();
+        const results = await Promise.all(requests);
+        const allData = results.reduce((acc, result) => {
           const extractedData = result.data.map((item: any) => ({
             id: item.id,
             title: item.title,
@@ -135,21 +181,23 @@ const App: React.FC = () => {
             date_start: item.date_start,
             date_end: item.date_end,
           }));
-          pageData.push(...extractedData);
-        }
+          return [...acc, ...extractedData];
+        }, data);
+  
         for (let i = 1; i <= selectedRowIds; i++) {
-          newSelectedRowsMap[pageData[i - 1].id] = true;
+          newSelectedRowsMap[allData[i - 1].id] = true;
         }
       } catch (error) {
-        console.log(error);
+        console.error(error);
       } finally {
         setLoading(false);
       }
     }
-
+  
     setSelectedRowsMap(newSelectedRowsMap);
     localStorage.setItem("selectedRows", JSON.stringify(newSelectedRowsMap)); // Save to localStorage
   };
+  
   const renderCheckbox = (rowData: DataRow) => {
     return (
       <Checkbox
